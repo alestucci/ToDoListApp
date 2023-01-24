@@ -11,6 +11,8 @@ using Microsoft.Azure.WebJobs.Host;
 using Microsoft.AspNetCore.Http.Internal;
 using System.Linq;
 using ToDoListApp.Models;
+using Microsoft.SqlServer.Server;
+using Microsoft.Azure.Functions.Worker.Extensions.Sql;
 
 namespace ToDoListApp
 {
@@ -50,6 +52,20 @@ namespace ToDoListApp
             TodoApiInMemory.todoList.Add(todo);
             return new OkObjectResult(todo);
 
+        }
+
+        [FunctionName("InDb_CreateTodo")]
+        public static async Task<IActionResult> CreateTodoDb(
+            [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "tododb")]HttpRequest req, ILogger log,
+            [Sql("Todos", ConnectionStringSetting = "ConnectionString")] IAsyncCollector<Todo> todos)
+        {
+            string requestBody = await new StreamReader(req.Body).ReadToEndAsync();
+            var input = JsonConvert.DeserializeObject<Todo> (requestBody);
+
+            await todos.AddAsync(input);
+            await todos.FlushAsync();
+
+            return new OkResult();
         }
 
         [FunctionName("InMemory_UpdateTodo")]
