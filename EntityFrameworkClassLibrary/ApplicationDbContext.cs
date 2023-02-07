@@ -1,4 +1,6 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Azure.Identity;
+using Azure.Security.KeyVault.Secrets;
+using Microsoft.EntityFrameworkCore;
 using ToDoListApp;
 
 namespace EntityFrameworkClassLibrary
@@ -15,7 +17,15 @@ namespace EntityFrameworkClassLibrary
             {
                 //string connectionString = Environment.GetEnvironmentVariable("ConnectionString");
                 //optionsBuilder.UseSqlServer(connectionString);
-                optionsBuilder.UseSqlServer("Data Source=(localdb)\\mssqllocaldb;Initial Catalog=ToDo;Integrated Security=True");
+                //optionsBuilder.UseSqlServer("Server=tcp:sqlcommondatabase.database.windows.net,1433;Initial Catalog=Todo-Db-At;Persist Security Info=False;User ID=adminne;Password=Password123;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;");
+
+                //string secretUri = "https://azurekeyvault-ac.vault.azure.net";
+                string secretUri = Environment.GetEnvironmentVariable("KeyVaultUri");
+                var client = new SecretClient(new Uri(secretUri), new DefaultAzureCredential());
+
+                var secret = client.GetSecret("DbConnectionString-at");
+
+                optionsBuilder.UseSqlServer(secret.Value.Value);
             }
         }
 
