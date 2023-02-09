@@ -70,11 +70,11 @@ namespace ToDoListApp
             string requestBody = await new StreamReader(req.Body).ReadToEndAsync();
             Todo modifiedTodo = JsonConvert.DeserializeObject<Todo>(requestBody);
 
-            await _unitOfWork.todo.UpdateTodo(modifiedTodo);
+            var response = await _unitOfWork.todo.UpdateTodo(modifiedTodo);
             await _unitOfWork.Save();
             _unitOfWork.Dispose();
 
-            return new OkObjectResult(modifiedTodo);
+            return response;
         }
 
         [FunctionName("Db_DeleteTodo")]
