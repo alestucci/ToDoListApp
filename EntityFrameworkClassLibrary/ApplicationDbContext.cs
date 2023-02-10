@@ -1,7 +1,4 @@
-﻿using Azure.Identity;
-using Azure.Security.KeyVault.Secrets;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
+﻿using Microsoft.EntityFrameworkCore;
 using ToDoListApp;
 
 namespace EntityFrameworkClassLibrary
@@ -12,22 +9,7 @@ namespace EntityFrameworkClassLibrary
 
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options) { }
 
-        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-        {
-            if (!optionsBuilder.IsConfigured)
-            {
-                //var configuration = new ConfigurationBuilder().AddJsonFile("appsettings.json", optional: false, reloadOnChange: true).Build();
-                //var kvaultUrl = configuration.GetValue<string>("VaultUri");
-
-                string secretUri = Environment.GetEnvironmentVariable("KeyVaultUri");
-                var client = new SecretClient(new Uri(secretUri), new DefaultAzureCredential());
-
-                string secret = client.GetSecret("DbConnectionString-at").Value.Value;
-
-                optionsBuilder.UseSqlServer(secret);
-            }
-        }
-
+        public DbSet<Todo> Todos { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             //modelBuilder.Entity<Todo>(entity =>
@@ -59,8 +41,5 @@ namespace EntityFrameworkClassLibrary
                 }
                 );
         }
-
-        public DbSet<Todo> Todos { get; set; }
-
     }
 }
