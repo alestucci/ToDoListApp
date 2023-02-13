@@ -5,8 +5,8 @@ using Microsoft.Azure.Functions.Extensions.DependencyInjection;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.Http;
 using Microsoft.Extensions.Logging;
-using Microsoft.IdentityModel.Tokens;
 using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
@@ -30,7 +30,7 @@ namespace ToDoListApp
         {
             log.LogInformation("C# HTTP trigger function processed a request.");
             
-            if (id.IsNullOrEmpty())
+            if (String.IsNullOrEmpty(id))
             {
                 IEnumerable<Todo> todos = await _unitOfWork.todo.GetAllTodos();
                 _unitOfWork.Dispose();
