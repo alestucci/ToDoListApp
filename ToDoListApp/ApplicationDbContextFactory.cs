@@ -13,7 +13,7 @@ namespace ToDoListApp
         public ApplicationDbContext CreateDbContext(string[] args)
         {
             var configuration = new ConfigurationBuilder().AddJsonFile("appsettings.json", optional: false, reloadOnChange: true).Build();
-            var kvaulturi = configuration.GetValue<string>("KeyVaultUri");
+            var kvaulturi = configuration.GetValue<string>("KVaultUri");
             var secretClient = new SecretClient(new Uri(kvaulturi), new DefaultAzureCredential());
             var connectionString = secretClient.GetSecret("DbConnectionString-at").Value.Value;
 

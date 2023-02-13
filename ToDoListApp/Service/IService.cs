@@ -4,18 +4,15 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using ToDoListApp;
 
-namespace EntityFrameworkClassLibrary.Repository
+namespace ToDoListApp.Service
 {
-    public interface ITodoRepository : IRepository<Todo>
+    internal interface IService
     {
         Task<IEnumerable<Todo>> GetAllTodos();
         Task<Todo> GetTodoById(string id);
         Task AddTodo(Todo todo);
         Task<IActionResult> UpdateTodo(Todo todo);
-        Task<IActionResult> DeleteTodo(Todo todo);
-        void Update(Todo todo);
-        void Save();
+        Task<IActionResult> DeleteTodo(string id);
     }
 }

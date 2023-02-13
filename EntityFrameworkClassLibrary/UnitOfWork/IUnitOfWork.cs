@@ -3,12 +3,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using EntityFrameworkClassLibrary.Repository;
 
-namespace EntityFrameworkClassLibrary.Repository
+namespace EntityFrameworkClassLibrary.UnitOfWork
 {
     public interface IUnitOfWork : IDisposable
     {
-        ITodoRepository todo { get; }
+        ITodoRepository TodoRepository { get; }
         Task Save();
         void Dispose();
 

@@ -53,15 +53,11 @@ namespace EntityFrameworkClassLibrary.Repository
             return new OkObjectResult(todo);
         }
 
-        public async Task<IActionResult> DeleteTodo(string id)
+        public async Task<IActionResult> DeleteTodo(Todo todo)
         {
-            Todo? dbTodo = await _db.Todos.FindAsync(id);
-            if (dbTodo == null)
-                return new NotFoundResult();
+            _db.Todos.Remove(todo);
 
-            _db.Todos.Remove(dbTodo);
-
-            return new OkObjectResult(dbTodo);
+            return new OkObjectResult(todo);
         }
 
 

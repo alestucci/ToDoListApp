@@ -1,21 +1,16 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using EntityFrameworkClassLibrary.Repository;
+﻿using EntityFrameworkClassLibrary.Repository;
 
 namespace EntityFrameworkClassLibrary.UnitOfWork
 {
     public class UnitOfWork : IUnitOfWork
     {
         private readonly ApplicationDbContext _db;
-        public ITodoRepository todo { get; set; }
+        public ITodoRepository TodoRepository { get; set; }
 
         public UnitOfWork(ApplicationDbContext db)
         {
                 _db = db;
-                todo = new TodoRepository(_db);
+                TodoRepository = new TodoRepository(_db);
         }
 
         public async void Dispose()

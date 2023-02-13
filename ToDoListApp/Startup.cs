@@ -3,7 +3,6 @@ using Azure.Security.KeyVault.Secrets;
 using AzureFunctions.Extensions.Swashbuckle;
 using AzureFunctions.Extensions.Swashbuckle.Settings;
 using EntityFrameworkClassLibrary;
-using EntityFrameworkClassLibrary.Repository;
 using EntityFrameworkClassLibrary.UnitOfWork;
 using Microsoft.Azure.Functions.Extensions.DependencyInjection;
 using Microsoft.EntityFrameworkCore;
@@ -11,6 +10,9 @@ using Microsoft.Extensions.DependencyInjection;
 using Swashbuckle.AspNetCore.SwaggerGen;
 using System;
 using System.Reflection;
+using Mapster;
+using MapsterMapper;
+using ToDoListApp.Service;
 
 namespace ToDoListApp
 {
@@ -18,7 +20,15 @@ namespace ToDoListApp
     {
         public override void Configure(IFunctionsHostBuilder builder)
         {
+
+            var config = TypeAdapterConfig.GlobalSettings;
+            config.Scan(Assembly.GetExecutingAssembly());
+
+            builder.Services.AddSingleton(config);
+            builder.Services.AddScoped<IMapper, ServiceMapper>();
             builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
+            builder.Services.AddScoped<IService, Service>();
+
 
             //string DbConnectionString = Environment.GetEnvironmentVariable("KeyVaultConnectionString");
             //builder.Services.AddDbContext<ApplicationDbContext>(options => options.UseSqlServer(DbConnectionString));
