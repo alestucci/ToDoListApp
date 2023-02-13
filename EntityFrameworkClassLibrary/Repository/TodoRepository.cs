@@ -19,7 +19,7 @@ namespace EntityFrameworkClassLibrary.Repository
 
         public async Task<IEnumerable<Todo>> GetAllTodos()
         {
-            var todos = await _db.Todos.ToListAsync();
+            var todos = await _db.Todos.OrderBy(x => x.CreatedTime).ToListAsync();
 
             return todos;
         }

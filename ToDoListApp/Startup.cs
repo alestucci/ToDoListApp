@@ -1,14 +1,16 @@
 ﻿using Azure.Identity;
 using Azure.Security.KeyVault.Secrets;
+using AzureFunctions.Extensions.Swashbuckle;
+using AzureFunctions.Extensions.Swashbuckle.Settings;
 using EntityFrameworkClassLibrary;
 using EntityFrameworkClassLibrary.Repository;
 using EntityFrameworkClassLibrary.UnitOfWork;
 using Microsoft.Azure.Functions.Extensions.DependencyInjection;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Swashbuckle.AspNetCore.SwaggerGen;
 using System;
-using System.IO;
+using System.Reflection;
 
 namespace ToDoListApp
 {
@@ -26,6 +28,23 @@ namespace ToDoListApp
             var connectionString = secretClient.GetSecret("DbConnectionString-at").Value.Value;
 
             builder.Services.AddDbContext<ApplicationDbContext>(options => options.UseSqlServer(connectionString));
+
+            builder.AddSwashBuckle(Assembly.GetExecutingAssembly(), opts => {
+                opts.AddCodeParameter = true;
+                opts.Documents = new[] {
+                    new SwaggerDocument {
+                        Name = "v1",
+                            Title = "Swagger document",
+                            Description = "Integrate Swagger UI With Azure Functions",
+                            Version = "v2"
+                    }
+                };
+                opts.ConfigureSwaggerGen = x => {
+                    x.CustomOperationIds(apiDesc => {
+                        return apiDesc.TryGetMethodInfo(out MethodInfo mInfo) ? mInfo.Name : default(Guid).ToString();
+                    });
+                };
+            });
         }
     }
 }
