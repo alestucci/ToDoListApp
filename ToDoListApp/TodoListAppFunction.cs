@@ -62,33 +62,56 @@ namespace ToDoListApp
             return Task.FromResult(swashBuckleClient.CreateSwaggerUIResponse(req, "swagger/json"));
         }
 
-        [FunctionName("Db_GetTodo")]
+        [FunctionName("Db_GetAllTodos")]
         //[QueryStringParameter("Id", "Required todo's Id", Required = false)]
-        [OpenApiOperation(operationId: "GetTodo", tags: new[] { "Get the todo list or a todo by ID" })]
-        [OpenApiParameter(name: "id", In = ParameterLocation.Path, Required = false, Type = typeof(string), Description = "The **ID** parameter")]
+        [OpenApiOperation(operationId: "GetAllTodos", tags: new[] { "Get the todo list" })]
+        //[OpenApiParameter(name: "id", In = ParameterLocation.Path, Required = false, Type = typeof(string), Description = "The **ID** parameter")]
+        //[OpenApiResponseWithBody(statusCode: HttpStatusCode.OK, contentType: "text/plain", bodyType: typeof(string), Description = "The OK response")]
+        //[OpenApiSecurity("function_key", SecuritySchemeType.ApiKey, Name = "code", In = OpenApiSecurityLocationType.Query)]
+        public async Task<IActionResult> GetAllTodosFromDb(
+            [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "alltodos")] HttpRequest req, ILogger log)
+        {
+            log.LogInformation("C# HTTP trigger function processed a request.");
+
+
+            IEnumerable<Todo> todos = await _unitOfWork.todo.GetAllTodos();
+            _unitOfWork.Dispose();
+            return new OkObjectResult(todos);
+
+        }
+
+        [FunctionName("Db_GetTodoById")]
+        //[QueryStringParameter("Id", "Required todo's Id", Required = false)]
+        [OpenApiOperation(operationId: "GetTodoById", tags: new[] { "Get the todo by ID" })]
+        [OpenApiParameter(name: "id", In = ParameterLocation.Path, Required = true, Type = typeof(string), Description = "The ID parameter")]
         //[OpenApiResponseWithBody(statusCode: HttpStatusCode.OK, contentType: "text/plain", bodyType: typeof(string), Description = "The OK response")]
         //[OpenApiSecurity("function_key", SecuritySchemeType.ApiKey, Name = "code", In = OpenApiSecurityLocationType.Query)]
         public async Task<IActionResult> GetTodoFromDb(
             [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "todo/{id}")] HttpRequest req, ILogger log, string id)
         {
             log.LogInformation("C# HTTP trigger function processed a request.");
-            
-            if (String.IsNullOrEmpty(id) || id == "undefined" || id == "{id}")
-            {
-                IEnumerable<Todo> todos = await _unitOfWork.todo.GetAllTodos();
-                _unitOfWork.Dispose();
-                return new OkObjectResult(todos);
-            } else
-            {
-                Todo todo = await _unitOfWork.todo.GetTodoById(id);
-                _unitOfWork.Dispose();
-                return new OkObjectResult(todo);
-            }
+
+            //if (id == "" || id == null || id == "undefined" || id == "{id}")
+            //{
+            //    IEnumerable<Todo> todos = await _unitOfWork.todo.GetAllTodos();
+            //    _unitOfWork.Dispose();
+            //    return new OkObjectResult(todos);
+            //} else
+            //{
+            //    Todo todo = await _unitOfWork.todo.GetTodoById(id);
+            //    _unitOfWork.Dispose();
+            //    return new OkObjectResult(todo);
+            //}
+
+            Todo todo = await _unitOfWork.todo.GetTodoById(id);
+            _unitOfWork.Dispose();
+            return new OkObjectResult(todo);
+
         }
 
         [FunctionName("Db_CreateTodo")]
         [OpenApiOperation(operationId: "NewTodo", tags: new[] { "Create a todo" })]
-        [OpenApiRequestBody("application/json", typeof(Todo))]
+        [OpenApiRequestBody("application/json", typeof(TodoNew))]
         //[OpenApiParameter(name: "todo", In = ParameterLocation.Header, Required = true, Type = typeof(string), Description = "New Todo")]
         //[OpenApiResponseWithBody(statusCode: HttpStatusCode.OK, contentType: "text/plain", bodyType: typeof(string), Description = "The OK response")]
         public async Task<IActionResult> CreateTodoDb(
@@ -110,7 +133,7 @@ namespace ToDoListApp
 
         [FunctionName("Db_UpdateTodo")]
         [OpenApiOperation(operationId: "UpdateTodo", tags: new[] { "Update an existing todo" })]
-        [OpenApiRequestBody("application/json", typeof(Todo))]
+        [OpenApiRequestBody("application/json", typeof(TodoUpdate))]
         public async Task<IActionResult> UpdateTodo(
             [HttpTrigger(AuthorizationLevel.Anonymous, "put", Route = "todo")] HttpRequest req, ILogger log)
         {
@@ -128,7 +151,7 @@ namespace ToDoListApp
 
         [FunctionName("Db_DeleteTodo")]
         [OpenApiOperation(operationId: "DeleteTodo", tags: new[] { "Delete an existing todo" })]
-        [OpenApiParameter(name: "id", In = ParameterLocation.Path, Required = false, Type = typeof(string), Description = "The **ID** parameter")]
+        [OpenApiParameter(name: "id", In = ParameterLocation.Path, Required = true, Type = typeof(string), Description = "The ID parameter")]
         public async Task<IActionResult> DeleteTodo(
             [HttpTrigger(AuthorizationLevel.Anonymous, "delete", Route = "todo/{id}")] HttpRequest req, ILogger log, string id)
         {
