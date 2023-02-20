@@ -1,13 +1,11 @@
-﻿namespace ToDoListApp
+﻿using EntityFrameworkClassLibrary.Models;
+
+namespace ToDoListApp
 {
-    public class Todo
+    public class Todo : Timestamps
     {
         public string Id { get; set; } = Guid.NewGuid().ToString();
-        public DateTime CreatedTime { get; set; } = DateTime.Now;
         public string TaskDescription { get; set; }
         public bool IsCompleted { get; set; } = false;
     }
-
-
-
 }

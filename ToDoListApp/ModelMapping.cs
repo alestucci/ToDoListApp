@@ -8,8 +8,8 @@ namespace ToDoListApp
         void IRegister.Register(TypeAdapterConfig config)
         {
             config.ForType<Todo, TodoDto>()
-                .Map(dest => dest.Date, src => src.CreatedTime.ToLongDateString())
-                .Map(dest => dest.Time, src => src.CreatedTime.ToShortDateString());
+                .Map(dest => dest.Date, src => src.Updated.ToLongDateString())
+                .Map(dest => dest.Time, src => src.Updated.ToShortTimeString());
         }
     }
 }

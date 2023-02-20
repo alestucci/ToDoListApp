@@ -15,7 +15,5 @@ namespace EntityFrameworkClassLibrary.Repository
         Task AddTodo(Todo todo);
         Task<IActionResult> UpdateTodo(Todo todo);
         Task<IActionResult> DeleteTodo(Todo todo);
-        void Update(Todo todo);
-        void Save();
     }
 }

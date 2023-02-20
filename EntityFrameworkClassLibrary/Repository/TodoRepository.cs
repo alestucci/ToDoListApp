@@ -1,10 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using ToDoListApp;
 
 namespace EntityFrameworkClassLibrary.Repository
@@ -19,7 +14,7 @@ namespace EntityFrameworkClassLibrary.Repository
 
         public async Task<IEnumerable<Todo>> GetAllTodos()
         {
-            var todos = await _db.Todos.OrderBy(x => x.CreatedTime).ToListAsync();
+            var todos = await _db.Todos.OrderBy(x => x.Updated).ToListAsync();
 
             return todos;
         }
@@ -60,15 +55,5 @@ namespace EntityFrameworkClassLibrary.Repository
             return new OkObjectResult(todo);
         }
 
-
-        public void Save()
-        {
-            _db.SaveChanges();
-        }
-
-        public void Update(Todo todo)
-        {
-            _db.Todos.Update(todo);
-        }
     }
 }

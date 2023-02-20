@@ -11,6 +11,8 @@ using Newtonsoft.Json;
 using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
+using ToDoListApp.BusinessLogic;
+using ToDoListApp.Dto;
 
 //Startup.cs trigger
 [assembly: FunctionsStartup(typeof(ToDoListApp.Startup))]
@@ -19,12 +21,12 @@ namespace ToDoListApp
 {
     public class TodoListAppFunction
     {
-        private readonly IUnitOfWork _unitOfWork;
-        public TodoListAppFunction(IUnitOfWork unitOfWork)
+        //private readonly IUnitOfWork _unitOfWork;
+        private readonly IService _service;
+        public TodoListAppFunction(IService service)
         {
-            _unitOfWork = unitOfWork;
+            _service = service;
         }
-        [ApiExplorerSettings(GroupName = "testee")]
 
         [FunctionName("Db_GetAllTodos")]
         //[QueryStringParameter("Id", "Required todo's Id", Required = false)]
@@ -37,11 +39,9 @@ namespace ToDoListApp
         {
             log.LogInformation("C# HTTP trigger function processed a request.");
 
+            IEnumerable<TodoDto> todos = await _service.GetAllTodos();  
 
-            IEnumerable<Todo> todos = await _unitOfWork.todo.GetAllTodos();
-            _unitOfWork.Dispose();
             return new OkObjectResult(todos);
-
         }
 
         [FunctionName("Db_GetTodoById")]
@@ -55,8 +55,7 @@ namespace ToDoListApp
         {
             log.LogInformation("C# HTTP trigger function processed a request.");
 
-            Todo todo = await _unitOfWork.todo.GetTodoById(id);
-            _unitOfWork.Dispose();
+            TodoDto todo = await _service.GetTodoById(id);
             return new OkObjectResult(todo);
 
         }
@@ -74,11 +73,9 @@ namespace ToDoListApp
             string requestBody = await new StreamReader(req.Body).ReadToEndAsync();
             Todo newTodo = JsonConvert.DeserializeObject<Todo>(requestBody);
 
-            await _unitOfWork.todo.AddTodo(newTodo);
-            await _unitOfWork.Save();
-            _unitOfWork.Dispose();
+            await _service.AddTodo(newTodo);
 
-            log.LogInformation("Todo created: Id = {0}, CreatedTime = {1}, TaskDescription = {2}, IsCompleted = {3}", newTodo.Id, newTodo.CreatedTime, newTodo.TaskDescription, newTodo.IsCompleted);
+            log.LogInformation("Todo created: Id = {0}, Created at = {1} of {2}, TaskDescription = {3}, IsCompleted = {4}", newTodo.Id, newTodo.Created.ToShortTimeString(), newTodo.Created.ToShortDateString(), newTodo.TaskDescription, newTodo.IsCompleted);
 
             return new OkObjectResult(newTodo);
         }
@@ -94,9 +91,7 @@ namespace ToDoListApp
             string requestBody = await new StreamReader(req.Body).ReadToEndAsync();
             Todo modifiedTodo = JsonConvert.DeserializeObject<Todo>(requestBody);
 
-            var response = await _unitOfWork.todo.UpdateTodo(modifiedTodo);
-            await _unitOfWork.Save();
-            _unitOfWork.Dispose();
+            var response = await _service.UpdateTodo(modifiedTodo);
 
             return response;
         }
@@ -109,9 +104,7 @@ namespace ToDoListApp
         {
             log.LogInformation("C# HTTP trigger function processed a request.");
 
-            await _unitOfWork.todo.DeleteTodo(id);
-            await _unitOfWork.Save();
-            _unitOfWork.Dispose();
+            await _service.DeleteTodo(id);
 
             return new OkResult();
         }
