@@ -13,6 +13,7 @@ using System.Reflection;
 using Mapster;
 using MapsterMapper;
 using ToDoListApp.BusinessLogic;
+using EntityFrameworkClassLibrary.Policies;
 
 namespace ToDoListApp
 {
@@ -24,6 +25,7 @@ namespace ToDoListApp
             var config = TypeAdapterConfig.GlobalSettings;
             config.Scan(Assembly.GetExecutingAssembly());
 
+            builder.Services.AddSingleton<ClientPolicy>(new ClientPolicy());
             builder.Services.AddSingleton(config);
             builder.Services.AddScoped<IMapper, ServiceMapper>();
             builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
